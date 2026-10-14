@@ -6,13 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+// Importamos nuestros componentes reutilizables
+import cl.duoc.cmqsalud.ui.components.CMQButton
+import cl.duoc.cmqsalud.ui.components.CMQTextField
 
 @Composable
 fun LoginScreen() {
-    // Variables de estado para los campos de texto
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -23,7 +24,7 @@ fun LoginScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Título o Logo de la App
+        // Títulos
         Text(
             text = "CMQ Salud",
             fontSize = 32.sp,
@@ -38,40 +39,31 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Campo de Correo / RUT
-        OutlinedTextField(
+        // Usamos nuestro componente CMQTextField para el correo
+        CMQTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo Institucional o RUT") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            label = "Correo Institucional o RUT"
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de Contraseña
-        OutlinedTextField(
+        // Usamos nuestro componente CMQTextField para la contraseña
+        CMQTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            label = "Contraseña",
+            isPassword = true
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botón de Inicio de Sesión
-        Button(
+        // Usamos nuestro componente CMQButton para la acción
+        CMQButton(
+            text = "Iniciar Sesión",
             onClick = {
-                // TODO: Conectar con LoginViewModel en el futuro
                 println("Intento de login con: $email")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text("Iniciar Sesión", fontSize = 16.sp)
-        }
+            }
+        )
     }
 }
