@@ -11,7 +11,7 @@
 
 ## 👥 Integrantes del Equipo
 * **Integrante 1:** Joaquin allendes
-* **Integrante 2:** 
+* **Integrante 2:** Benjamin Molina
 
 ---
 
