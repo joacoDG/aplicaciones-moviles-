@@ -12,6 +12,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import android.Manifest
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,6 +44,31 @@ fun IngresarPacienteScreen(navController: NavController) {
     var apellido by remember { mutableStateOf("") }
     var fechaNacimiento by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+
+    var fotoBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    // 1. Lanzador para abrir la cámara y recibir la foto
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        if (bitmap != null) {
+            fotoBitmap = bitmap // Si hay foto, actualizamos el estado
+        } else {
+            Toast.makeText(context, "No se capturó ninguna foto", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // 2. Lanzador para pedir el permiso de la cámara
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Si da el permiso, abrimos la cámara
+            cameraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -43,7 +87,8 @@ fun IngresarPacienteScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
             OutlinedTextField(
                 value = nombre,
@@ -70,6 +115,33 @@ fun IngresarPacienteScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
+            Text(text = "Foto de perfil", fontWeight = FontWeight.Bold)
+
+            // Muestra la foto si existe
+            if (fotoBitmap != null) {
+                Image(
+                    bitmap = fotoBitmap!!.asImageBitmap(),
+                    contentDescription = "Foto del paciente",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                )
+            } else {
+                // Un cuadro o icono por defecto si no hay foto
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Sin foto",
+                    modifier = Modifier.size(120.dp),
+                    tint = Color.Gray
+                )
+            }
+
+            Button(
+                onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) },
+                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+            ) {
+                Text("Tomar Foto")
+            }
 
             Button(
                 onClick = {
